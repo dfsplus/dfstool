@@ -98,12 +98,11 @@
 	// 	port:443,
 	// 	protocol:'https'
 	// });
+	console.log = function(msg) {
+		let str = $("#log").text() + "\n" + msg;
+		$("#log").text(str);
+	}
 	
-	console.log = function (msg) {
-			let str = $("#log").text() + "\n" + msg;
-			$("#log").text(str);
-		}
-
 	// function login() {
 	// 	ScatterJS.connect('MyAppName', {network}).then(async connected => {
 	// 		if (!connected) {
@@ -142,10 +141,12 @@
 	// 	}
 	// }
 	let liqs = {};
+	let account;
+	let eos;
 	async function login() {
 		if (await ScatterJS.connect('MyAppName', {network})) {
 			console.log("连接成功");
-			await ScatterJS.logout()
+			//await ScatterJS.logout()
 			let ret = await ScatterJS.login().catch(err => {
 				if (err.isError) {
 					console.log(err);
@@ -155,8 +156,9 @@
 			});
 			if (ret !== false) {
 				console.log("登陆成功");
-				const account = ScatterJS.account('eos');
-				console.log(JSON.stringify(account));
+				account = ScatterJS.account('eos');
+				eos = ScatterJS.eos(network, Eos);
+				console.log(account);
 				liqs = await getLiqs();
 			}
 		} else {
@@ -166,8 +168,8 @@
 	}
 
 	async function getLiqs() {
-		const account = ScatterJS.account('eos');
-		eos = ScatterJS.eos(network, Eos);
+		//const account = ScatterJS.account('eos');
+		//eos = ScatterJS.eos(network, Eos);
 		const opts = { authorization: [`${account.name}@${account.authority}`] };
 
 		let dfsPool = await eos.getTableRows({"code":"usdxvotevote","scope":"usdxvotevote","table":"pools2","json":true,"limit":100}).then(data => {
@@ -201,8 +203,9 @@
 
 			return liqs;
 		});
+		return liqs;
 	}
-	
+
 	async function claimDfs() {
 		let actions = [];
 		liqs.dfs.forEach(mid => {
@@ -214,7 +217,8 @@
 					permission: 'active'
 				}],	
 				data: {
-					mid: mid
+					mid: mid,
+					user: account.name
 				}				
 			});
 		});
@@ -239,7 +243,8 @@
 					permission: 'active'
 				}],	
 				data: {
-					mid: mid
+					mid: mid,
+					user: account.name
 				}				
 			});
 		});
@@ -253,52 +258,12 @@
 		});	
 	}
 
+
 		//console.log(dfsPool, usdcPool, liqs);
 
 		// eos.getInfo({}).then(data => {
 		// 	console.log(data);
-		// })
-
-		// eos.transaction({
-		// 	actions: [
-		// 		{
-		// 			account: 'eosio.token',
-		// 			name: 'transfer',
-		// 			authorization: [{
-		// 				actor: `${account.name}`,
-		// 				permission: 'active'
-		// 			}],
-		// 			data: {
-		// 				from: `${account.name}`,
-		// 				to: 'davidaccount',
-		// 				quantity: '0.3000 EOS',
-		// 				memo: '备注'
-		// 			}
-		// 		},
-		// 		{
-		// 			account: 'eosio.token',
-		// 			name: 'transfer',
-		// 			authorization: [{
-		// 				actor: `${account.name}`,
-		// 				permission: 'active'
-		// 			}],
-		// 			data: {
-		// 				from: `${account.name}`,
-		// 				to: 'davidaccount',
-		// 				quantity: '0.1000 EOS',
-		// 				memo: '备注'
-		// 			}
-		// 		}			
-		// 	]
-		// }).then(trx => {
-		// 	console.log('trx', trx);
-		// }).catch(err => {
-		// 	console.error(err);
-		// });		
-
-
-
-	}
+		// })	
 </script>
 
 </html>

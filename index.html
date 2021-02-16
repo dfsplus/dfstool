@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>大丰收工具</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+  <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="./js/scatterjs-core.min.js"></script>
+  <script src="./js/scatterjs-plugin-eosjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/eosjs@16.0.9/lib/eos.min.js"></script>
+  
+</head>
+<body>
+
+<div class="container">
+
+<div class="row">
+  <div class="col"><h2>大丰收工具</h2></div>
+  <div class="col"><button type="button" class="btn" id="login" onclick="login()">登陆</button></div>
+</div>
+  
+
+  
+  <div class="card">
+    <div class="card-header">USDX矿池</div>
+    <div class="card-body">
+	  <button type="button" class="btn btn-primary" id="claimUsdc" onclick="claimUsdc()">USDC矿池收矿</button>
+	  <button type="button" class="btn btn-primary" id="claimDfs" onclick="claimDfs()">DFS矿池收矿</button>
+	  <button type="button" class="btn btn-primary" id="claimUsdx" onclick="claimUsdx()">全部收矿</button>	
+	</div> 
+  </div>
+  <br>
+  
+  <div class="card">
+    <div class="card-header">DFS矿池</div>
+    <div class="card-body">
+	  <button type="button" class="btn btn-primary">DFS矿池收矿</button>
+	  <button type="button" class="btn btn-primary">DFS金库收矿</button>
+	  <button type="button" class="btn btn-primary">全部收矿</button>	
+	</div> 
+  </div>
+  <br>
+  
+  <div class="card">
+    <div class="card-header">TAG矿池</div>
+    <div class="card-body">
+	  <button type="button" class="btn btn-primary">TAG矿池收矿</button>
+	  <button type="button" class="btn btn-primary">TAG金库收矿</button>
+	  <button type="button" class="btn btn-primary">全部收矿</button>	
+	</div> 
+  </div>
+  <br>
+  
+  <div class="card">
+    <div class="card-header">YFC矿池</div>
+    <div class="card-body">
+	  <button type="button" class="btn btn-primary">YFC金库收矿</button>
+	  <button type="button" class="btn btn-primary">全部收矿</button>	
+	</div> 
+  </div>
+  <br>
+
+  <div class="card">
+    <div class="card-header">自定义</div>
+    <div class="card-body">
+	  <button type="button" class="btn btn-primary">自定义1</button>
+	  <button type="button" class="btn btn-primary">自定义2</button>	
+	</div> 
+  </div>
+  <br>
+
+</div>
+
+</body>
+
+<script>
+    ScatterJS.plugins( new ScatterEOS() );
+	const network = ScatterJS.Network.fromJson({
+		blockchain:'eos',
+		chainId:'aca376f206b8fc25a6ed44dbdc66547c36c6c33e3a119ffbeaef943642f0e906',
+		host:'openapi.eos.ren',
+		port:80,
+		protocol:'http'
+	});
+	// const network = ScatterJS.Network.fromJson({
+	// 	blockchain:'eos',
+	// 	chainId:'2a02a0053e5a8cf73a56ba0fda11e4d92e0238a4a2aa74fccf46d5a910746840',
+	// 	host:'jungle3.cryptolions.io',
+	// 	port:443,
+	// 	protocol:'https'
+	// });
+	
+	// function login() {
+	// 	ScatterJS.connect('MyAppName', {network}).then(async connected => {
+	// 		if (!connected) {
+	// 			console.log("connect fail");
+	// 			return -1;
+	// 		} else {
+	// 			console.log("connect pass");
+	// 			//await ScatterJS.logout();
+	// 			//await await ScatterJS.logout();
+	// 			await ScatterJS.logout();
+	// 			var ret = await ScatterJS.login().catch(err => {
+	// 				if (err.isError) {
+	// 					console.log(err);
+	// 					console.log("登陆失败");
+	// 					return false;
+	// 				}
+	// 			});
+	// 			console.log(ret);
+	// 			//console.log(logined);
+	// 			//console.log(ScatterJS.account('eos'));
+	// 			//const account = ScatterJS.identity.accounts.find(x => x.blockchain === 'eos');
+	// 			const account = ScatterJS.account('eos');
+	// 			console.log(account);
+	// 			$("#login").text(account.name);
+
+	// 		}
+	// 	});	
+
+	// async function login() {
+	// 	if (await ScatterJS.connect('MyAppName', {network})) {
+	// 		console.log("连接成功");
+	// 		return true;
+	// 	} else {
+	// 		console.log("连接失败");
+	// 		return false;
+	// 	}
+	// }
+	async function login() {
+		if (await ScatterJS.connect('MyAppName', {network})) {
+			console.log("连接成功");
+			//await ScatterJS.logout()
+			let ret = await ScatterJS.login().catch(err => {
+				if (err.isError) {
+					console.log(err);
+					console.log("登陆失败")
+					return false;
+				}
+			});
+			if (ret !== false) {
+				console.log("登陆成功");
+				const account = ScatterJS.account('eos');
+				console.log(account);
+				await test();
+			}
+		} else {
+			console.log("连接失败");
+			return false;
+		}
+	}
+
+	async function test() {
+		const account = ScatterJS.account('eos');
+		eos = ScatterJS.eos(network, Eos);
+		const opts = { authorization: [`${account.name}@${account.authority}`] };
+
+		let dfsPool = await eos.getTableRows({"code":"usdxvotevote","scope":"usdxvotevote","table":"pools2","json":true,"limit":100}).then(data => {
+			data.rows.sort((a, b) => {
+				return b.total_votes - a.total_votes;
+			});
+			return data.rows.slice(0, 21);
+		});
+
+		let usdcPool = await eos.getTableRows({"code":"usdxvotevote","scope":"usdxvotevote","table":"pools","json":true,"limit":100}).then(data => {
+			data.rows.sort((a, b) => {
+				return b.total_votes - a.total_votes;
+			});
+			return data.rows.slice(0, 21);
+		});
+
+		let liqs = await eos.getTableRows({"code":"defislogsone","scope":"hazdqmjqgige","table":"liqs2","json":true,"limit":100}).then(data => {
+			let liqs = {usdc: [], dfs: []};
+			for (let i=0; i<data.rows.length; i++) {
+				if ((data.rows[i].bal0.lastIndexOf("DFS") != -1) ||
+					(data.rows[i].bal1.lastIndexOf("DFS") != -1)) {
+					liqs.dfs.push(data.rows[i].mid);
+					continue;
+				}
+
+				if ((data.rows[i].bal0.lastIndexOf("USDC") != -1) ||
+					(data.rows[i].bal1.lastIndexOf("USDC")) != -1) {
+					liqs.usdc.push(data.rows[i].mid);
+				}
+			}
+
+			return liqs;
+		});
+
+		async function claimDfs() {
+			let actions = [];
+			liqs.dfs.forEach(mid => {
+				actions.push({
+					account: 'usdxcorefarm',
+					name: 'claim',
+					authorization: [{
+						actor: account.name,
+						permission: 'active'
+					}],	
+					data: {
+						mid: mid
+					}				
+				});
+			});
+
+			eos.transaction({
+				actions: actions
+			}).then(trx => {
+				console.log('trx', trx);
+			}).catch(err => {
+				console.error(err);
+			});	
+		}
+
+		//console.log(dfsPool, usdcPool, liqs);
+
+		// eos.getInfo({}).then(data => {
+		// 	console.log(data);
+		// })
+
+		// eos.transaction({
+		// 	actions: [
+		// 		{
+		// 			account: 'eosio.token',
+		// 			name: 'transfer',
+		// 			authorization: [{
+		// 				actor: `${account.name}`,
+		// 				permission: 'active'
+		// 			}],
+		// 			data: {
+		// 				from: `${account.name}`,
+		// 				to: 'davidaccount',
+		// 				quantity: '0.3000 EOS',
+		// 				memo: '备注'
+		// 			}
+		// 		},
+		// 		{
+		// 			account: 'eosio.token',
+		// 			name: 'transfer',
+		// 			authorization: [{
+		// 				actor: `${account.name}`,
+		// 				permission: 'active'
+		// 			}],
+		// 			data: {
+		// 				from: `${account.name}`,
+		// 				to: 'davidaccount',
+		// 				quantity: '0.1000 EOS',
+		// 				memo: '备注'
+		// 			}
+		// 		}			
+		// 	]
+		// }).then(trx => {
+		// 	console.log('trx', trx);
+		// }).catch(err => {
+		// 	console.error(err);
+		// });		
+
+
+	}
+</script>
+
+</html>

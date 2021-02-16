@@ -141,6 +141,7 @@
 	// 		return false;
 	// 	}
 	// }
+	let liqs = {};
 	async function login() {
 		if (await ScatterJS.connect('MyAppName', {network})) {
 			console.log("连接成功");
@@ -156,7 +157,7 @@
 				console.log("登陆成功");
 				const account = ScatterJS.account('eos');
 				console.log(JSON.stringify(account));
-				await test();
+				liqs = await getLiqs();
 			}
 		} else {
 			console.log("连接失败");
@@ -164,7 +165,7 @@
 		}
 	}
 
-	async function test() {
+	async function getLiqs() {
 		const account = ScatterJS.account('eos');
 		eos = ScatterJS.eos(network, Eos);
 		const opts = { authorization: [`${account.name}@${account.authority}`] };
@@ -200,31 +201,57 @@
 
 			return liqs;
 		});
-
-		async function claimDfs() {
-			let actions = [];
-			liqs.dfs.forEach(mid => {
-				actions.push({
-					account: 'usdxcorefarm',
-					name: 'claim',
-					authorization: [{
-						actor: account.name,
-						permission: 'active'
-					}],	
-					data: {
-						mid: mid
-					}				
-				});
+	}
+	
+	async function claimDfs() {
+		let actions = [];
+		liqs.dfs.forEach(mid => {
+			actions.push({
+				account: 'usdxcorefarm',
+				name: 'claim',
+				authorization: [{
+					actor: account.name,
+					permission: 'active'
+				}],	
+				data: {
+					mid: mid
+				}				
 			});
+		});
 
-			eos.transaction({
-				actions: actions
-			}).then(trx => {
-				console.log('trx', trx);
-			}).catch(err => {
-				console.error(err);
-			});	
-		}
+		eos.transaction({
+			actions: actions
+		}).then(trx => {
+			console.log('trx', trx);
+		}).catch(err => {
+			console.error(err);
+		});	
+	}
+
+	async function claimUsdc() {
+		let actions = [];
+		liqs.usdc.forEach(mid => {
+			actions.push({
+				account: 'usdxcorefarm',
+				name: 'claim',
+				authorization: [{
+					actor: account.name,
+					permission: 'active'
+				}],	
+				data: {
+					mid: mid
+				}				
+			});
+		});
+
+		eos.transaction({
+			actions: actions
+		}).then(trx => {
+			console.log('trx', trx);
+		}).catch(err => {
+			console.error(err);
+		});	
+	}
 
 		//console.log(dfsPool, usdcPool, liqs);
 

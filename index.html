@@ -71,6 +71,12 @@
 	</div> 
   </div>
   <br>
+  <div class="card">
+    <div class="card-header">输出</div>
+    <div class="card-body">
+	  <textarea rows="20" cols="80" id="log"></textarea>	
+	</div> 
+  </div>
 
 </div>
 
@@ -93,6 +99,11 @@
 	// 	protocol:'https'
 	// });
 	
+	console.log = function (msg) {
+			let str = $("#log").text() + "\n" + msg;
+			$("#log").text(str);
+		}
+
 	// function login() {
 	// 	ScatterJS.connect('MyAppName', {network}).then(async connected => {
 	// 		if (!connected) {
@@ -133,7 +144,7 @@
 	async function login() {
 		if (await ScatterJS.connect('MyAppName', {network})) {
 			console.log("连接成功");
-			//await ScatterJS.logout()
+			await ScatterJS.logout()
 			let ret = await ScatterJS.login().catch(err => {
 				if (err.isError) {
 					console.log(err);
@@ -144,7 +155,7 @@
 			if (ret !== false) {
 				console.log("登陆成功");
 				const account = ScatterJS.account('eos');
-				console.log(account);
+				console.log(JSON.stringify(account));
 				await test();
 			}
 		} else {
@@ -257,6 +268,7 @@
 		// }).catch(err => {
 		// 	console.error(err);
 		// });		
+
 
 
 	}

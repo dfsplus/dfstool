@@ -19,17 +19,15 @@
 
 <div class="row">
   <div class="col"><h2>大丰收工具</h2></div>
-  <div class="col"><button type="button" class="btn" id="login" onclick="login()">登陆</button></div>
+  <!--div class="col"><button type="button" class="btn" id="login" onclick="login()">登陆</button></div-->
 </div>
-  
-
   
   <div class="card">
     <div class="card-header">USDX矿池</div>
     <div class="card-body">
-	  <button type="button" class="btn btn-primary" id="claimUsdc" onclick="claimUsdc()">USDC矿池收矿</button>
-	  <button type="button" class="btn btn-primary" id="claimDfs" onclick="claimDfs()">DFS矿池收矿</button>
-	  <button type="button" class="btn btn-primary" id="claimUsdx" onclick="claimUsdx()">全部收矿</button>	
+	  <button type="button" class="btn btn-primary" id="claimUsdxUsdc" onclick="claimUsdxUsdc()">USDC矿池收矿</button>
+	  <button type="button" class="btn btn-primary" id="claimUsdxDfs" onclick="claimUsdxDfs()">DFS矿池收矿</button>
+	  <button type="button" class="btn btn-primary" id="claimUsdxAll" onclick="claimUsdxAll()">全部收矿</button>	
 	</div> 
   </div>
   <br>
@@ -37,9 +35,9 @@
   <div class="card">
     <div class="card-header">DFS矿池</div>
     <div class="card-body">
-	  <button type="button" class="btn btn-primary">DFS矿池收矿</button>
-	  <button type="button" class="btn btn-primary">DFS金库收矿</button>
-	  <button type="button" class="btn btn-primary">全部收矿</button>	
+	  <button type="button" class="btn btn-primary" id="claimDfs" onclick="claimDfs()">DFS矿池收矿</button>
+	  <button type="button" class="btn btn-primary" id="claimDfsDss" onclick="claimDfsDss()">DFS金库收矿</button>
+	  <button type="button" class="btn btn-primary" id="claimDfsAll" onclick="claimDfsAll()">全部收矿</button>	
 	</div> 
   </div>
   <br>
@@ -47,9 +45,9 @@
   <div class="card">
     <div class="card-header">TAG矿池</div>
     <div class="card-body">
-	  <button type="button" class="btn btn-primary">TAG矿池收矿</button>
-	  <button type="button" class="btn btn-primary">TAG金库收矿</button>
-	  <button type="button" class="btn btn-primary">全部收矿</button>	
+	  <button type="button" class="btn btn-primary" id="claimTag" onclick="claimTag()">TAG矿池收矿</button>
+	  <button type="button" class="btn btn-primary" id="claimTagDss" onclick="claimTagDss()">TAG金库收矿</button>
+	  <button type="button" class="btn btn-primary" id="claimTagAll" onclick="claimTagAll()">全部收矿</button>	
 	</div> 
   </div>
   <br>
@@ -57,8 +55,16 @@
   <div class="card">
     <div class="card-header">YFC矿池</div>
     <div class="card-body">
-	  <button type="button" class="btn btn-primary">YFC金库收矿</button>
-	  <button type="button" class="btn btn-primary">全部收矿</button>	
+	  <button type="button" class="btn btn-primary" id="claimYfcDss" onclick="claimYfcDss()">YFC金库收矿</button>
+	  <button type="button" class="btn btn-primary" id="claimYfcAll" onclick="claimYfcAll()">全部收矿</button>	
+	</div> 
+  </div>
+  <br>
+
+  <div class="card">
+    <div class="card-header">PDD农场</div>
+    <div class="card-body">
+	  <button type="button" class="btn btn-primary" id="claimPdd" onclick="claimPdd()">PDD农场收矿</button>
 	</div> 
   </div>
   <br>
@@ -98,55 +104,23 @@
 	// 	port:443,
 	// 	protocol:'https'
 	// });
-	console.log = function(msg) {
-		let str = $("#log").text() + "\n" + msg;
-		$("#log").text(str);
-	}
-	
-	// function login() {
-	// 	ScatterJS.connect('MyAppName', {network}).then(async connected => {
-	// 		if (!connected) {
-	// 			console.log("connect fail");
-	// 			return -1;
-	// 		} else {
-	// 			console.log("connect pass");
-	// 			//await ScatterJS.logout();
-	// 			//await await ScatterJS.logout();
-	// 			await ScatterJS.logout();
-	// 			var ret = await ScatterJS.login().catch(err => {
-	// 				if (err.isError) {
-	// 					console.log(err);
-	// 					console.log("登陆失败");
-	// 					return false;
-	// 				}
-	// 			});
-	// 			console.log(ret);
-	// 			//console.log(logined);
-	// 			//console.log(ScatterJS.account('eos'));
-	// 			//const account = ScatterJS.identity.accounts.find(x => x.blockchain === 'eos');
-	// 			const account = ScatterJS.account('eos');
-	// 			console.log(account);
-	// 			$("#login").text(account.name);
-
-	// 		}
-	// 	});	
-
-	// async function login() {
-	// 	if (await ScatterJS.connect('MyAppName', {network})) {
-	// 		console.log("连接成功");
-	// 		return true;
-	// 	} else {
-	// 		console.log("连接失败");
-	// 		return false;
-	// 	}
+	// console.log = function(msg) {
+	// 	let str = $("#log").text() + "\n" + msg;
+	// 	$("#log").text(str);
 	// }
-	let liqs = {};
+	let userLiqsMids = [];	
+	let usdxLiqsMids = {usdc: [], dfs: [], usdd: []};
+	let usdxPoolMids = {usdc: [], dfs: [], usdb: []};
+	let tagLiqsMids = [];
+	let dfsPoolMids = [];
+	let tagPoolMids = [];
 	let account;
 	let eos;
+
 	async function login() {
 		if (await ScatterJS.connect('MyAppName', {network})) {
 			console.log("连接成功");
-			//await ScatterJS.logout()
+			await ScatterJS.logout()
 			let ret = await ScatterJS.login().catch(err => {
 				if (err.isError) {
 					console.log(err);
@@ -159,7 +133,7 @@
 				account = ScatterJS.account('eos');
 				eos = ScatterJS.eos(network, Eos);
 				console.log(account);
-				liqs = await getLiqs();
+				liqs = await getUserLiqs();
 			}
 		} else {
 			console.log("连接失败");
@@ -167,86 +141,292 @@
 		}
 	}
 
-	async function getLiqs() {
-		//const account = ScatterJS.account('eos');
-		//eos = ScatterJS.eos(network, Eos);
-		const opts = { authorization: [`${account.name}@${account.authority}`] };
-
-		let dfsPool = await eos.getTableRows({"code":"usdxvotevote","scope":"usdxvotevote","table":"pools2","json":true,"limit":100}).then(data => {
+	async function getUserLiqs() {
+		usdxPoolMids.usdc = await eos.getTableRows({"code":"usdxvotevote","scope":"usdxvotevote","table":"pools","json":true,"limit":100}).then(data => {
 			data.rows.sort((a, b) => {
 				return b.total_votes - a.total_votes;
 			});
-			return data.rows.slice(0, 21);
+
+			let mids = [];
+			for (let i=0; i<21; i++) {
+				mids.push(data.rows[i].mid);
+			}
+			console.log(mids);
+			return mids;
 		});
 
-		let usdcPool = await eos.getTableRows({"code":"usdxvotevote","scope":"usdxvotevote","table":"pools","json":true,"limit":100}).then(data => {
+		usdxPoolMids.dfs = await eos.getTableRows({"code":"usdxvotevote","scope":"usdxvotevote","table":"pools2","json":true,"limit":100}).then(data => {
 			data.rows.sort((a, b) => {
 				return b.total_votes - a.total_votes;
 			});
-			return data.rows.slice(0, 21);
+
+			let mids = [];
+			for (let i=0; i<21; i++) {
+				mids.push(data.rows[i].mid);
+			}
+			console.log(mids);
+			return mids;
 		});
 
-		let liqs = await eos.getTableRows({"code":"defislogsone","scope":"hazdqmjqgige","table":"liqs2","json":true,"limit":100}).then(data => {
-			let liqs = {usdc: [], dfs: []};
+		dfsPoolMids = await eos.getTableRows({"code":"dfspoolsvote","scope":"dfspoolsvote","table":"pools","json":true,"limit":21, "index_position":2,"key_type":"float64"}).then(data => {
+			let mids = [];
+			for (let i=0; i<21; i++) {
+				mids.push(data.rows[i].mid);
+			}
+			console.log(mids);
+			return mids;
+		});
+
+		PddPoolMids = await eos.getTableRows({"code":"dfspoolsvote","scope":"dfspoolsvote","table":"pools","json":true,"limit":10, "index_position":2,"key_type":"float64"}).then(data => {
+			let mids = [];
+			for (let i=0; i<10; i++) {
+				mids.push(data.rows[i].mid);
+			}
+			if (mids.includes(346) === false) {
+				mids.push(346);
+			}
+			console.log(mids);
+			return mids;
+		});
+
+		tagPoolMids = await eos.getTableRows({"code":"vote.tag","scope":"vote.tag","table":"pools","json":true,"limit":15, "index_position":2,"key_type":"float64"}).then(data => {
+			let mids = [];
+			for (let i=0; i<15; i++) {
+				mids.push(data.rows[i].mid);
+			}
+			console.log(mids);
+			return mids;
+		});
+
+		//user liqs mid
+		await eos.getTableRows({"code": "defislogsone","scope": account.name,"table": "liqs2","json": true,"limit": 100}).then(data => {
 			for (let i=0; i<data.rows.length; i++) {
-				if ((data.rows[i].bal0.lastIndexOf("DFS") != -1) ||
-					(data.rows[i].bal1.lastIndexOf("DFS") != -1)) {
-					liqs.dfs.push(data.rows[i].mid);
-					continue;
+				userLiqsMids.push(data.rows[i].mid); //需要放在最前面
+
+				if ((data.rows[i].bal0.lastIndexOf("TAG") != -1) ||
+					(data.rows[i].bal1.lastIndexOf("TAG") != -1)) {
+					tagLiqsMids.push(data.rows[i].mid);
 				}
 
 				if ((data.rows[i].bal0.lastIndexOf("USDC") != -1) ||
 					(data.rows[i].bal1.lastIndexOf("USDC")) != -1) {
-					liqs.usdc.push(data.rows[i].mid);
+					usdxLiqsMids.usdc.push(data.rows[i].mid);
+					continue;
+				}
+
+				if ((data.rows[i].bal0.lastIndexOf("DFS") != -1) ||
+					(data.rows[i].bal1.lastIndexOf("DFS") != -1)) {
+					usdxLiqsMids.dfs.push(data.rows[i].mid);
 				}
 			}
-
-			return liqs;
 		});
-		return liqs;
+	}
+
+	async function claimPdd() {
+		let actions = [];
+		console.log(userLiqsMids);
+		userLiqsMids.forEach(mid => {
+			if (PddPoolMids.includes(mid)) {
+				actions.push({
+					account: 'pddfarmers11',
+					name: 'feed',
+					authorization: [{
+						actor: account.name,
+						permission: 'active'
+					}],	
+					data: {
+						id: mid,
+						user: account.name
+					}				
+				});
+			}
+		});
+
+		if (actions.length !== 0) {
+			eos.transaction({
+				actions: actions
+			}).then(trx => {
+				console.log('trx', trx);
+			}).catch(err => {
+				console.error(err);
+			});	
+		} else {
+			console.log("你的做市交易对不在DFS矿池排名范围内");
+		}
+	}
+
+	async function claimTag() {
+		let actions = [];
+		console.log(tagLiqsMids);
+		tagLiqsMids.forEach(mid => {
+			if (tagPoolMids.includes(mid)) {
+				actions.push({
+					account: 'tagtokenfarm',
+					name: 'claim',
+					authorization: [{
+						actor: account.name,
+						permission: 'active'
+					}],	
+					data: {
+						mid: mid,
+						user: account.name
+					}				
+				});
+			}
+		});
+
+		//投票挖矿，暂不加入
+		// actions.push({
+		// 	account: 'tagtokenfarm',
+		// 	name: 'harvest',
+		// 	authorization: [{
+		// 		actor: account.name,
+		// 		permission: 'active'
+		// 	}],	
+		// 	data: {
+		// 		farmer: account.name
+		// 	}				
+		// });
+
+		if (actions.length !== 0) {
+			eos.transaction({
+				actions: actions
+			}).then(trx => {
+				console.log('trx', trx);
+			}).catch(err => {
+				console.error(err);
+			});	
+		} else {
+			console.log("你的做市交易对不在TAG矿池排名范围内");
+		}
+	}
+
+	async function claimTagDss() {
+		let actions = [];
+		actions.push({
+			account: 'dss.tag',
+			name: 'claim',
+			authorization: [{
+				actor: account.name,
+				permission: 'active'
+			}],	
+			data: {
+				user: account.name
+			}				
+		});
+
+		eos.transaction({
+			actions: actions
+		}).then(trx => {
+			console.log('trx', trx);
+		}).catch(err => {
+			console.error(err);
+		});	
+	}
+
+	async function claimTagAll() {
+		let actions = [];
+		console.log(tagLiqsMids);
+		tagLiqsMids.forEach(mid => {
+			if (tagPoolMids.includes(mid)) {
+				actions.push({
+					account: 'tagtokenfarm',
+					name: 'claim',
+					authorization: [{
+						actor: account.name,
+						permission: 'active'
+					}],	
+					data: {
+						mid: mid,
+						user: account.name
+					}				
+				});
+			}
+		});
+
+		actions.push({
+			account: 'dss.tag',
+			name: 'claim',
+			authorization: [{
+				actor: account.name,
+				permission: 'active'
+			}],	
+			data: {
+				user: account.name
+			}				
+		});
+
+		//投票挖矿，暂不加入
+		// actions.push({
+		// 	account: 'tagtokenfarm',
+		// 	name: 'harvest',
+		// 	authorization: [{
+		// 		actor: account.name,
+		// 		permission: 'active'
+		// 	}],	
+		// 	data: {
+		// 		farmer: account.name
+		// 	}				
+		// });
+
+		if (actions.length !== 0) {
+			eos.transaction({
+				actions: actions
+			}).then(trx => {
+				console.log('trx', trx);
+			}).catch(err => {
+				console.error(err);
+			});	
+		} else {
+			console.log("你的做市交易对不在TAG矿池排名范围内");
+		}
 	}
 
 	async function claimDfs() {
 		let actions = [];
-		liqs.dfs.forEach(mid => {
-			actions.push({
-				account: 'usdxcorefarm',
-				name: 'claim',
-				authorization: [{
-					actor: account.name,
-					permission: 'active'
-				}],	
-				data: {
-					mid: mid,
-					user: account.name
-				}				
-			});
+		console.log(userLiqsMids);
+		userLiqsMids.forEach(mid => {
+			if (dfsPoolMids.includes(mid)) {
+				actions.push({
+					account: 'miningpool11',
+					name: 'claim',
+					authorization: [{
+						actor: account.name,
+						permission: 'active'
+					}],	
+					data: {
+						mid: mid,
+						user: account.name
+					}				
+				});
+			}
 		});
 
-		eos.transaction({
-			actions: actions
-		}).then(trx => {
-			console.log('trx', trx);
-		}).catch(err => {
-			console.error(err);
-		});	
+		if (actions.length !== 0) {
+			eos.transaction({
+				actions: actions
+			}).then(trx => {
+				console.log('trx', trx);
+			}).catch(err => {
+				console.error(err);
+			});	
+		} else {
+			console.log("你的做市交易对不在DFS矿池排名范围内");
+		}
 	}
 
-	async function claimUsdc() {
+	async function claimDfsDss() {
 		let actions = [];
-		liqs.usdc.forEach(mid => {
-			actions.push({
-				account: 'usdxcorefarm',
-				name: 'claim',
-				authorization: [{
-					actor: account.name,
-					permission: 'active'
-				}],	
-				data: {
-					mid: mid,
-					user: account.name
-				}				
-			});
+		actions.push({
+			account: 'dfsdsrsystem',
+			name: 'claim',
+			authorization: [{
+				actor: account.name,
+				permission: 'active'
+			}],	
+			data: {
+				user: account.name
+			}				
 		});
 
 		eos.transaction({
@@ -258,12 +438,206 @@
 		});	
 	}
 
+	async function claimDfsAll() {
+		let actions = [];
+		console.log(userLiqsMids);
+		userLiqsMids.forEach(mid => {
+			if (dfsPoolMids.includes(mid)) {
+				actions.push({
+					account: 'miningpool11',
+					name: 'claim',
+					authorization: [{
+						actor: account.name,
+						permission: 'active'
+					}],	
+					data: {
+						mid: mid,
+						user: account.name
+					}				
+				});
+			}
+		});
 
-		//console.log(dfsPool, usdcPool, liqs);
+		actions.push({
+			account: 'dfsdsrsystem',
+			name: 'claim',
+			authorization: [{
+				actor: account.name,
+				permission: 'active'
+			}],	
+			data: {
+				user: account.name
+			}				
+		});
 
-		// eos.getInfo({}).then(data => {
-		// 	console.log(data);
-		// })	
+		eos.transaction({
+			actions: actions
+		}).then(trx => {
+			console.log('trx', trx);
+		}).catch(err => {
+			console.error(err);
+		});	
+	}
+
+	async function claimYfcDss() {
+		let actions = [];
+		actions.push({
+			account: 'yfcdsssystem',
+			name: 'claim',
+			authorization: [{
+				actor: account.name,
+				permission: 'active'
+			}],	
+			data: {
+				user: account.name
+			}				
+		});
+
+		eos.transaction({
+			actions: actions
+		}).then(trx => {
+			console.log('trx', trx);
+		}).catch(err => {
+			console.error(err);
+		});	
+	}
+
+	async function claimYfcAll() {
+		let actions = [];
+		actions.push({
+			account: 'yfcdsssystem',
+			name: 'claim',
+			authorization: [{
+				actor: account.name,
+				permission: 'active'
+			}],	
+			data: {
+				user: account.name
+			}				
+		});
+
+		eos.transaction({
+			actions: actions
+		}).then(trx => {
+			console.log('trx', trx);
+		}).catch(err => {
+			console.error(err);
+		});	
+	}
+
+	async function claimUsdxDfs() {
+		let actions = [];
+		usdxLiqsMids.dfs.forEach(mid => {
+			if (usdxPoolMids.dfs.includes(mid)) {
+				actions.push({
+					account: 'usdxcorefarm',
+					name: 'claim',
+					authorization: [{
+						actor: account.name,
+						permission: 'active'
+					}],	
+					data: {
+						mid: mid,
+						user: account.name
+					}				
+				});
+			}
+		});
+
+		if (actions.length !== 0) {
+			eos.transaction({
+				actions: actions
+			}).then(trx => {
+				console.log('trx', trx);
+			}).catch(err => {
+				console.error(err);
+			});	
+		} else {
+			console.log("你的DFS做市交易对不在USDX排名范围内");
+		}
+	}
+
+	async function claimUsdxUsdc() {
+		let actions = [];
+		usdxLiqsMids.usdc.forEach(mid => {
+			if (usdxPoolMids.usdc.includes(mid)) {
+				actions.push({
+					account: 'usdxcorefarm',
+					name: 'claim',
+					authorization: [{
+						actor: account.name,
+						permission: 'active'
+					}],	
+					data: {
+						mid: mid,
+						user: account.name
+					}				
+				});
+			}
+		});
+
+		if (actions.length !== 0) {
+			eos.transaction({
+				actions: actions
+			}).then(trx => {
+				console.log('trx', trx);
+			}).catch(err => {
+				console.error(err);
+			});	
+		} else {
+			console.log("你的USDC做市交易对不在USDX排名范围内");
+		}
+	}
+
+	async function claimUsdxAll() {
+		let actions = [];
+		usdxLiqsMids.usdc.forEach(mid => {
+			if (usdxPoolMids.usdc.includes(mid)) {
+				actions.push({
+					account: 'usdxcorefarm',
+					name: 'claim',
+					authorization: [{
+						actor: account.name,
+						permission: 'active'
+					}],	
+					data: {
+						mid: mid,
+						user: account.name
+					}				
+				});
+			}
+		});
+		usdxLiqsMids.dfs.forEach(mid => {
+			if (usdxPoolMids.dfs.includes(mid)) {
+				actions.push({
+					account: 'usdxcorefarm',
+					name: 'claim',
+					authorization: [{
+						actor: account.name,
+						permission: 'active'
+					}],	
+					data: {
+						mid: mid,
+						user: account.name
+					}				
+				});
+			}
+		});
+
+		if (actions.length !== 0) {
+			eos.transaction({
+				actions: actions
+			}).then(trx => {
+				console.log('trx', trx);
+			}).catch(err => {
+				console.error(err);
+			});	
+		} else {
+			console.log("你的USDC与DFS做市交易对不在USDX排名范围内");
+		}
+	}
+
+	login();
 </script>
 
 </html>

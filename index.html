@@ -5,13 +5,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./css/toast.min.css">
   <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
   <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
   <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="./js/toast.min.js"></script>
   <script src="./js/scatterjs-core.min.js"></script>
   <script src="./js/scatterjs-plugin-eosjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/eosjs@16.0.9/lib/eos.min.js"></script>
-  
 </head>
 <body>
 
@@ -21,7 +22,7 @@
   <div class="col"><h2>大丰收工具</h2></div>
   <!--div class="col"><button type="button" class="btn" id="login" onclick="login()">登陆</button></div-->
 </div>
-  
+<div class="row"><div class="col">
   <div class="card">
     <div class="card-header">USDX矿池</div>
     <div class="card-body">
@@ -31,7 +32,33 @@
 	</div> 
   </div>
   <br>
-  
+</div></div>
+
+<div class="row"><div class="col">
+  <div class="card">
+    <div class="card-header">DFX矿池</div>
+    <div class="card-body">
+	  <button type="button" class="btn btn-primary" id="claimDfxUsdc" onclick="claimDfxUsdc()">USDC矿池收矿</button>
+	  <button type="button" class="btn btn-primary" id="claimDfxDfg" onclick="claimDfxDfg()">DFG矿池收矿</button>
+	  <!--button type="button" class="btn btn-primary" id="claimEusdxAll" onclick="claimEusdxAll()">全部收矿</button-->	
+	</div> 
+  </div>
+  <br>
+</div></div>
+
+<div class="row"><div class="col"> 
+  <div class="card">
+    <div class="card-header">EUSDX矿池</div>
+    <div class="card-body">
+	  <button type="button" class="btn btn-primary" id="claimEusdxEusdc" onclick="claimEusdxEusdc()">EUSDC矿池收矿</button>
+	  <button type="button" class="btn btn-primary" id="claimEusdxEusds" onclick="claimEusdxEusds()">EUSDS矿池收矿</button>
+	  <button type="button" class="btn btn-primary" id="claimEusdxAll" onclick="claimEusdxAll()">全部收矿</button>	
+	</div> 
+  </div>
+  <br>
+</div></div>
+
+<div class="row"><div class="col">  
   <div class="card">
     <div class="card-header">DFS矿池</div>
     <div class="card-body">
@@ -41,7 +68,9 @@
 	</div> 
   </div>
   <br>
-  
+</div></div>
+
+<div class="row"><div class="col"> 
   <div class="card">
     <div class="card-header">TAG矿池</div>
     <div class="card-body">
@@ -51,7 +80,9 @@
 	</div> 
   </div>
   <br>
-  
+</div></div>
+
+<div class="row"><div class="col">  
   <div class="card">
     <div class="card-header">YFC矿池</div>
     <div class="card-body">
@@ -60,7 +91,9 @@
 	</div> 
   </div>
   <br>
+</div></div>
 
+<div class="row"><div class="col">
   <div class="card">
     <div class="card-header">PDD农场</div>
     <div class="card-body">
@@ -68,7 +101,9 @@
 	</div> 
   </div>
   <br>
+</div></div>
 
+<div class="row"><div class="col">
   <div class="card">
     <div class="card-header">自定义</div>
     <div class="card-body">
@@ -77,18 +112,16 @@
 	</div> 
   </div>
   <br>
-  <div class="card">
-    <div class="card-header">输出</div>
-    <div class="card-body">
-	  <textarea rows="20" cols="80" id="log"></textarea>	
-	</div> 
-  </div>
+</div></div>
 
 </div>
 
 </body>
 
 <script>
+	//$.toastDefaults.position = 'top-center';
+	$.toastDefaults.dismissible = false;
+	
     ScatterJS.plugins( new ScatterEOS() );
 	const network = ScatterJS.Network.fromJson({
 		blockchain:'eos',
@@ -124,12 +157,14 @@
 			let ret = await ScatterJS.login().catch(err => {
 				if (err.isError) {
 					console.log(err);
-					console.log("登陆失败")
+					console.log("登陆失败");
+					$.snack('error', '登陆失败', -1);
 					return false;
 				}
 			});
 			if (ret !== false) {
 				console.log("登陆成功");
+				$.snack('success', '登陆成功', 2000);
 				account = ScatterJS.account('eos');
 				eos = ScatterJS.eos(network, Eos);
 				console.log(account);
@@ -137,6 +172,7 @@
 			}
 		} else {
 			console.log("连接失败");
+			$.snack('error', '连接失败', -1);
 			return false;
 		}
 	}
@@ -247,11 +283,14 @@
 				actions: actions
 			}).then(trx => {
 				console.log('trx', trx);
+				$.snack('success', '交易成功', 2000);
 			}).catch(err => {
 				console.error(err);
+				$.snack('error', '交易失败', 2000);
 			});	
 		} else {
 			console.log("你的做市交易对不在DFS矿池排名范围内");
+			$.snack('error', '你的做市交易对不在DFS矿池排名范围内', 5000);
 		}
 	}
 
@@ -293,11 +332,15 @@
 				actions: actions
 			}).then(trx => {
 				console.log('trx', trx);
+				$.snack('success', '交易成功', 2000);
 			}).catch(err => {
 				console.error(err);
+				$.snack('error', '交易失败', 2000);
 			});	
 		} else {
 			console.log("你的做市交易对不在TAG矿池排名范围内");
+			$.snack('error', '你的做市交易对不在TAG矿池排名范围内', 5000);
+			
 		}
 	}
 
@@ -319,8 +362,10 @@
 			actions: actions
 		}).then(trx => {
 			console.log('trx', trx);
+			$.snack('success', '交易成功', 2000);
 		}).catch(err => {
 			console.error(err);
+			$.snack('error', '交易失败', 2000);
 		});	
 	}
 
@@ -374,11 +419,14 @@
 				actions: actions
 			}).then(trx => {
 				console.log('trx', trx);
+				$.snack('success', '交易成功', 2000);
 			}).catch(err => {
 				console.error(err);
+				$.snack('error', '交易失败', 2000);
 			});	
 		} else {
 			console.log("你的做市交易对不在TAG矿池排名范围内");
+			$.snack('error', '你的做市交易对不在TAG矿池排名范围内', 5000);
 		}
 	}
 
@@ -407,11 +455,14 @@
 				actions: actions
 			}).then(trx => {
 				console.log('trx', trx);
+				$.snack('success', '交易成功', 2000);
 			}).catch(err => {
 				console.error(err);
+				$.snack('error', '交易失败', 2000);
 			});	
 		} else {
 			console.log("你的做市交易对不在DFS矿池排名范围内");
+			$.snack('error', '你的做市交易对不在DFS矿池排名范围内', 5000);
 		}
 	}
 
@@ -433,8 +484,10 @@
 			actions: actions
 		}).then(trx => {
 			console.log('trx', trx);
+			$.snack('success', '交易成功', 2000);
 		}).catch(err => {
 			console.error(err);
+			$.snack('error', '交易失败', 2000);
 		});	
 	}
 
@@ -474,8 +527,10 @@
 			actions: actions
 		}).then(trx => {
 			console.log('trx', trx);
+			$.snack('success', '交易成功', 2000);
 		}).catch(err => {
 			console.error(err);
+			$.snack('error', '交易失败', 2000);
 		});	
 	}
 
@@ -497,8 +552,10 @@
 			actions: actions
 		}).then(trx => {
 			console.log('trx', trx);
+			$.snack('success', '交易成功', 2000);
 		}).catch(err => {
 			console.error(err);
+			$.snack('error', '交易失败', 2000);
 		});	
 	}
 
@@ -520,8 +577,10 @@
 			actions: actions
 		}).then(trx => {
 			console.log('trx', trx);
+			$.snack('success', '交易成功', 2000);
 		}).catch(err => {
 			console.error(err);
+			$.snack('error', '交易失败', 2000);
 		});	
 	}
 
@@ -549,14 +608,17 @@
 				actions: actions
 			}).then(trx => {
 				console.log('trx', trx);
+				$.snack('success', '交易成功', 2000);
 			}).catch(err => {
 				console.error(err);
+				$.snack('error', '交易失败', 2000);
 			});	
 		} else {
 			console.log("你的DFS做市交易对不在USDX排名范围内");
+			$.snack('error', '你的DFS做市交易对不在USDX排名范围内', 5000);
 		}
 	}
-
+	
 	async function claimUsdxUsdc() {
 		let actions = [];
 		usdxLiqsMids.usdc.forEach(mid => {
@@ -581,11 +643,14 @@
 				actions: actions
 			}).then(trx => {
 				console.log('trx', trx);
+				$.snack('success', '交易成功', 2000);
 			}).catch(err => {
 				console.error(err);
+				$.snack('error', '交易失败', 2000);
 			});	
 		} else {
 			console.log("你的USDC做市交易对不在USDX排名范围内");
+			$.snack('error', '你的USDC做市交易对不在USDX排名范围内', 5000);
 		}
 	}
 
@@ -629,11 +694,136 @@
 				actions: actions
 			}).then(trx => {
 				console.log('trx', trx);
+				$.snack('success', '交易成功', 2000);
 			}).catch(err => {
 				console.error(err);
+				$.snack('error', '交易失败', 2000);
 			});	
 		} else {
 			console.log("你的USDC与DFS做市交易对不在USDX排名范围内");
+			$.snack('error', '你的USDC与DFS做市交易对不在USDX排名范围内', 5000);
+		}
+	}
+	
+	async function claimEusdxEusds() {
+		let actions = [];
+		actions.push({
+			account: 'eoseusdscore',
+			name: 'claim',
+			authorization: [{
+				actor: account.name,
+				permission: 'active'
+			}],	
+			data: {
+				owner: account.name
+			}				
+		});
+
+		eos.transaction({
+			actions: actions
+		}).then(trx => {
+			console.log('trx', trx);
+			$.snack('success', '交易成功', 2000);
+		}).catch(err => {
+			console.error(err);
+			$.snack('error', '交易失败', 2000);
+		});	
+	}
+	
+	async function claimEusdxEusdc() {
+		let actions = [];
+		actions.push({
+			account: 'eoseusdccore',
+			name: 'claim',
+			authorization: [{
+				actor: account.name,
+				permission: 'active'
+			}],	
+			data: {
+				owner: account.name
+			}				
+		});
+
+		eos.transaction({
+			actions: actions
+		}).then(trx => {
+			console.log('trx', trx);
+			$.snack('success', '交易成功', 2000);
+		}).catch(err => {
+			console.error(err);
+			$.snack('error', '交易失败', 2000);
+		});	
+	}
+	
+	async function claimEusdxAll() {
+		let actions = [];
+		actions.push({
+			account: 'eoseusdccore',
+			name: 'claim',
+			authorization: [{
+				actor: account.name,
+				permission: 'active'
+			}],	
+			data: {
+				owner: account.name
+			}				
+		});
+		
+		actions.push({
+			account: 'eoseusdscore',
+			name: 'claim',
+			authorization: [{
+				actor: account.name,
+				permission: 'active'
+			}],	
+			data: {
+				owner: account.name
+			}				
+		});
+
+		eos.transaction({
+			actions: actions
+		}).then(trx => {
+			console.log('trx', trx);
+			$.snack('success', '交易成功', 2000);
+		}).catch(err => {
+			console.error(err);
+			$.snack('error', '交易失败', 2000);
+		});	
+	}
+	
+	async function claimDfxUsdc() {
+		let actions = [];
+		usdxLiqsMids.usdc.forEach(mid => {
+			if (usdxPoolMids.usdc.includes(mid)) {
+				actions.push({
+					account: 'dfxxcorefarm',
+					name: 'claim',
+					authorization: [{
+						actor: account.name,
+						permission: 'active'
+					}],	
+					data: {
+						mid: mid,
+						user: account.name
+					}				
+				});
+			}
+		});
+
+		if (actions.length !== 0) {
+			eos.transaction({
+				actions: actions
+			}).then(trx => {
+				console.log('trx', trx);
+				$.snack('success', '交易成功', 2000);
+			}).catch(err => {
+				console.error(err);
+				$.snack('error', '交易失败', 2000);
+			});	
+		} else {
+			console.log("你的USDC做市交易对不在USDX排名范围内");
+			$.snack('error', '你的USDC做市交易对不在USDX排名范围内', 5000);
 		}
 	}
 

@@ -13,6 +13,11 @@
   <script src="./js/scatterjs-core.min.js"></script>
   <script src="./js/scatterjs-plugin-eosjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/eosjs@16.0.9/lib/eos.min.js"></script>
+  <script src="./js/moment.min.js"></script>
+  <style>
+  .btn {margin-top: 5px;}
+  .card-body {padding-top: 1.00rem;}
+  </style>
 </head>
 <body>
 
@@ -22,6 +27,17 @@
   <div class="col"><h2>大丰收工具</h2></div>
   <!--div class="col"><button type="button" class="btn" id="login" onclick="login()">登陆</button></div-->
 </div>
+
+<div class="row"><div class="col">
+  <div class="card">
+    <div class="card-header">猪弟的农场</div>
+    <div class="card-body">
+	  <button type="button" class="btn btn-primary" id="checkin" onclick="checkin()">代签<span id="farmers" class="badge"></span></button>
+	</div> 
+  </div>
+  <br>
+</div></div>
+
 <div class="row"><div class="col">
   <div class="card">
     <div class="card-header">USDX矿池</div>
@@ -93,7 +109,7 @@
   <br>
 </div></div>
 
-<div class="row"><div class="col">
+<!--div class="row"><div class="col">
   <div class="card">
     <div class="card-header">PDD农场</div>
     <div class="card-body">
@@ -101,7 +117,7 @@
 	</div> 
   </div>
   <br>
-</div></div>
+</div></div-->
 
 <div class="row"><div class="col">
   <div class="card">
@@ -149,6 +165,7 @@
 	let tagPoolMids = [];
 	let account;
 	let eos;
+	let farmers = [];
 
 	async function login() {
 		if (await ScatterJS.connect('MyAppName', {network})) {
@@ -169,6 +186,7 @@
 				eos = ScatterJS.eos(network, Eos);
 				console.log(account);
 				liqs = await getUserLiqs();
+				farmers = await getAbledSignUsers();
 			}
 		} else {
 			console.log("连接失败");
@@ -827,7 +845,79 @@
 		}
 	}
 
-	login();
+	async function getAbledSignUsers() {
+		let farmers = [];
+		let next = "";
+		let more = true;
+		
+		while (more) {
+			let data = await eos.getTableRows({"code":"farms.tag","scope":"dfsdeveloper","table":"members","json":true,"limit": 1000, "lower_bound": next});
+			let length = 0;
+			
+			more = data.more;
+			if (more) {
+				length = data.rows.length - 1;
+				next = data.rows[length].owner;
+			} else {
+				length = data.rows.length;
+			}
+			
+			for (let i=0; i<length; i++) {
+				let wealth = Number(data.rows[i].wealth.split(" ")[0]);
+				if (wealth >= 1000.0000) {
+					let updateTime = data.rows[i].update_time;
+					updateTime = updateTime + ".000+0000";
+					//toLocalTime
+					updateTime = moment(updateTime).valueOf();
+					let diffTime = moment().valueOf() - updateTime;
+					if (diffTime > 3600 * 27 * 1000) {
+						farmers.push(data.rows[i].owner);
+					}				
+				}
+			}
+		}
+		$('#farmers').text(farmers.length);
+		return farmers;
+		//console.log(farmers);
+	}
+	
+	async function checkin() {
+		let actions = [];
+		console.log(farmers);
+		farmers.forEach(farmer => {
+			actions.push({
+				account: 'farms.tag',
+				name: 'checkin',
+				authorization: [{
+					actor: account.name,
+					permission: 'active'
+				}],	
+				data: {
+					farmer: farmer,
+					helper: account.name
+				}				
+			});
+		});
+
+		if (actions.length !== 0) {
+			eos.transaction({
+				actions: actions
+			}).then(trx => {
+				console.log('trx', trx);
+				$.snack('success', '交易成功', 2000);
+				$('#farmers').text(0);
+			}).catch(err => {
+				console.error(err);
+				$.snack('error', '交易失败', 2000);
+			});	
+		} else {
+			console.log("无可代签用户");
+			$.snack('error', '无可代签用户', 5000);
+		}
+	}
+	
+	login();	
+	
 </script>
 
 </html>

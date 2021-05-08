@@ -34,6 +34,7 @@
     <div class="card-body">
 	  <button type="button" class="btn btn-primary" name="dfsdeveloper" onclick="checkin(this.name)">猪弟的农场<span id="dfsdeveloper" class="badge"></span></button>
 	  <button type="button" class="btn btn-primary" name="dafengshouzs" onclick="checkin(this.name)">大风车农场<span id="dafengshouzs" class="badge"></span></button>
+	  <button type="button" class="btn btn-primary" name="dfsdavelopeo" onclick="checkin(this.name)">财狗币庄园<span id="dfsdavelopeo" class="badge"></span></button>
 	  <button type="button" class="btn btn-primary" name="mykeyvippink" onclick="checkin(this.name)">粉红梦庄园<span id="mykeyvippink" class="badge"></span></button>
 	  <button type="button" class="btn btn-primary" name="allfarms" onclick="checkin(this.name)">代签全部<span id="allfarms" class="badge"></span></button>
 	  <div style="padding-top: 20px;"><label>代签最大值：</label><input type="text" id="checkinmax" value="50"></div>
@@ -170,8 +171,8 @@
 	let tagPoolMids = [];
 	let account;
 	let eos;
-	let farms = {dfsdeveloper: [], dafengshouzs: [], mykeyvippink: [], allfarms: []};
-	const farmNames = ["dfsdeveloper", "dafengshouzs", "mykeyvippink"];
+	let farms = {dfsdeveloper: [], dafengshouzs: [], dfsdavelopeo: [], mykeyvippink: [], allfarms: []};
+	const farmNames = ["dfsdeveloper", "dafengshouzs", "dfsdavelopeo", "mykeyvippink"];
 	
 	async function login() {
 		if (await ScatterJS.connect('MyAppName', {network})) {
@@ -883,6 +884,36 @@
 							}				
 						}
 					}
+				} else if (key === "dfsdavelopeo") {
+					for (let i=0; i<length; i++) {
+						let wealth = Number(data.rows[i].wealth.split(" ")[0]);
+						if (wealth >= 10.0000) {
+							let updateTime = data.rows[i].update_time;
+							updateTime = updateTime + ".000+0000";
+							//toLocalTime
+							updateTime = moment(updateTime).valueOf();
+							let diffTime = moment().valueOf() - updateTime;
+							if (diffTime > 3600 * 27 * 1000) {
+								farms[key].push(data.rows[i].owner);
+								farms["allfarms"].push(data.rows[i].owner);
+							}				
+						}
+					}				
+				} else if (key === "mykeyvippink") {
+					for (let i=0; i<length; i++) {
+						let wealth = Number(data.rows[i].wealth.split(" ")[0]);
+						if (wealth >= 100.0000) {
+							let updateTime = data.rows[i].update_time;
+							updateTime = updateTime + ".000+0000";
+							//toLocalTime
+							updateTime = moment(updateTime).valueOf();
+							let diffTime = moment().valueOf() - updateTime;
+							if (diffTime > 3600 * 27 * 1000) {
+								farms[key].push(data.rows[i].owner);
+								farms["allfarms"].push(data.rows[i].owner);
+							}				
+						}
+					}				
 				} else {
 					for (let i=0; i<length; i++) {
 						let updateTime = data.rows[i].update_time;
